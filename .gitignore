@@ -1,0 +1,16 @@
+# Terraform files
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Local files
+terraform.tfvars
+vm-ip.txt
+kubeconfig
+connect-instructions.txt
+
+# Sensitive data
+*.pem
+*.key
+*.crt
