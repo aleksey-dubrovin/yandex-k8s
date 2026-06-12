@@ -34,6 +34,11 @@
    ssh ubuntu@<внешний_IP>
    ```
 
+5. Прверьте логи cliud_init на наличе ошибок:
+   ```bash
+   cat /var/log/cloud-init-output.log
+   ```
+
 ## Ручная настройка после установки
 
 ### 1. Проверьте, что MicroK8S работает
@@ -45,22 +50,20 @@ sudo microk8s kubectl get nodes
 
 ### 2. Установите Kubernetes Dashboard (если не включился автоматически)
 
-Ваш `cloud-init.yaml` уже включает `microk8s enable dns dashboard`, но иногда dashboard не устанавливается из-за 404 ошибки. Вручную:
-
 ```bash
-sudo microk8s kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+sudo microk8s enable dashboard -r https://kubernetes-retired.github.io/dashboard/
 ```
 
 ### 3. Переключите Dashboard на NodePort
 
 ```bash
-sudo microk8s kubectl patch svc kubernetes-dashboard -n kubernetes-dashboard -p '{"spec": {"type": "NodePort"}}'
+sudo microk8s kubectl patch svc kubernetes-dashboard-kong-proxy -n kubernetes-dashboard -p '{"spec": {"type": "NodePort"}}'
 ```
 
 Узнайте назначенный порт:
 
 ```bash
-sudo microk8s kubectl get svc -n kubernetes-dashboard
+sudo microk8s kubectl get svc kubernetes-dashboard-kong-proxy -n kubernetes-dashboard
 ```
 
 В строке `kubernetes-dashboard` в колонке `PORT(S)` будет `443:3XXXX/TCP` (например `30154`). Запомните этот порт.
@@ -120,6 +123,7 @@ echo "source <(kubectl completion bash)" >> ~/.bashrc
 
 **macOS:** `brew install kubectl`  
 **Windows:** скачайте `kubectl.exe` из релизов Kubernetes.
+**Подробнее:** https://kubernetes.io/ru/docs/tasks/tools/install-kubectl/
 
 #### 6.2 Получите токен для kubectl (можно использовать тот же, что для Dashboard)
 

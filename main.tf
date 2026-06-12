@@ -46,13 +46,6 @@ resource "yandex_vpc_security_group" "k8s" {
   ingress {
     protocol       = "TCP"
     v4_cidr_blocks = ["0.0.0.0/0"]
-    port           = 10443
-    description    = "Dashboard proxy"
-  }
-
-  ingress {
-    protocol       = "TCP"
-    v4_cidr_blocks = ["0.0.0.0/0"]
     from_port      = 30000
     to_port        = 32767
     description    = "Kubernetes NodePorts"
