@@ -13,3 +13,4 @@ output "ssh_command" {
 output "kubectl_command" {
   value = "ssh ubuntu@${yandex_compute_instance.k8s.network_interface[0].nat_ip_address} 'microk8s kubectl get nodes'"
 }
+

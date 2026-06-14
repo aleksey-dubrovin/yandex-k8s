@@ -38,6 +38,13 @@ resource "yandex_vpc_security_group" "k8s" {
 
   ingress {
     protocol       = "TCP"
+    description    = "HTTP for Load Balancer"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 80
+  }
+
+  ingress {
+    protocol       = "TCP"
     v4_cidr_blocks = ["0.0.0.0/0"]
     port           = 16443
     description    = "Kubernetes API"
@@ -55,6 +62,44 @@ resource "yandex_vpc_security_group" "k8s" {
     protocol       = "ANY"
     v4_cidr_blocks = ["0.0.0.0/0"]
     description    = "Allow all outgoing"
+  }
+}
+
+# 1. Целевая группа
+resource "yandex_lb_target_group" "k8s" {
+  name      = "${var.vm_name}-tg"
+  region_id = "ru-central1"
+
+  target {
+    subnet_id = yandex_vpc_subnet.k8s.id
+    address   = yandex_compute_instance.k8s.network_interface[0].ip_address
+  }
+}
+
+# 2. Сетевой балансировщик
+resource "yandex_lb_network_load_balancer" "k8s" {
+  name = "${var.vm_name}-lb"
+  region_id = "ru-central1"
+  listener {
+    name = "http-listener"
+    port = 80
+    # Внешний балансировщик (для доступа из интернета) [citation:5]
+    external_address_spec {
+      ip_version = "ipv4"
+    }
+}
+
+  attached_target_group {
+    target_group_id = yandex_lb_target_group.k8s.id
+
+    healthcheck {
+      name = "http"
+      # Проверка будет выполняться к вашему Ingress-контроллеру [citation:1][citation:2]
+      http_options {
+        port = 30306
+        path = "/"
+      }
+    }
   }
 }
 
