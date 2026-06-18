@@ -111,9 +111,4 @@ resource "yandex_compute_instance" "k8s" {
     preemptible = true
   }
 
-  lifecycle {
-    ignore_changes = [
-      boot_disk[0].initialize_params[0].image_id,
-    ]
-  }
 }
