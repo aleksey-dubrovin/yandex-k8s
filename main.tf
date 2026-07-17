@@ -74,11 +74,12 @@ resource "yandex_vpc_security_group" "k8s" {
 }
 
 data "yandex_compute_image" "ubuntu" {
-  family = "ubuntu-2204-lts"
+  family = "ubuntu-2404-lts"
 }
 
 resource "yandex_compute_instance" "k8s" {
   name        = var.vm_name
+  hostname    = var.vm_name
   platform_id = "standard-v3"
   zone        = var.zone
 
